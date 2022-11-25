@@ -1,46 +1,72 @@
 import requests
-from urllib.parse import urlparse, urljoin
+from requests.exceptions import RequestException
+from urllib.parse import urlparse
 import os
-import shutil
+from os.path import join, isdir
 from page_loader.logger import logging
-from page_loader.download_assets import download_assets
-from page_loader.utils import make_name
-from page_loader.prepare_html_and_assets import prepare_html_and_assets
+from page_loader.download_files import download_files
+from page_loader.utils import make_name, make_files_dir, save_html
+from page_loader.prepare_html_and_files import prepare_html_and_files
+
+
+HTML = '.html'
+FILES = '_files'
+INPUT_PATH_NOT_FOUND = 'Input path "{}" is not found.'
+START_DOWNLOAD = 'Start download "{}" in "{}"'
+REQUEST = 'Request at "{}"'
+REQUEST_ERROR = 'Request errror: {}'
+RESPONSE = 'Response status code {}'
+PREPARE_DATA = 'Prepare html and links for local assets'
+HTML_FILE_CREATED = 'html_file created successfully "{}"'
+FILES_DIR_CREATED = 'files_dir created successfully: "{}"'
+START_DOWNLOAD_FILES = 'Start download local files. Total count: "{}"'
+FINISH_DOWNLOAD_FILES = 'Files download successfully: "{}"'
+ERRORS_DOWNLOAD = '"{}" files did not download'
 
 
 def download(input_url, input_path):
     page_url = urlparse(input_url)
-    full_path_to_page = os.path.join(os.getcwd(), input_path)
+    full_path_to_page = join(os.getcwd(), input_path)
 
-    if not os.path.isdir(full_path_to_page):
-        raise FileNotFoundError
+    if not isdir(input_path):
+        logging.error(INPUT_PATH_NOT_FOUND.format(input_path))
+        raise ValueError(INPUT_PATH_NOT_FOUND.format(input_path))
 
-    html_file_name = make_name(page_url, '.html')
-    files_dir_name = make_name(page_url, '_files')
-    
-    html_file_path = os.path.join(full_path_to_page, html_file_name)
-    files_dir_path = os.path.join(full_path_to_page, files_dir_name)
+    html_file_name = make_name(page_url, HTML)
+    files_dir_name = make_name(page_url, FILES)
+
+    html_file_path = join(full_path_to_page, html_file_name)
+    files_dir_path = join(full_path_to_page, files_dir_name)
+
+    logging.info(START_DOWNLOAD.format(input_url, input_path))
+    logging.info(REQUEST.format(input_url))
 
     try:
         res = requests.get(input_url)
+        logging.debug(RESPONSE.format(res.status_code))
         res.raise_for_status()
-    except:
-        raise
+    except RequestException as e:
+        logging.error(REQUEST_ERROR.format(e))
+        raise RequestException(e) from e
 
-    html, assets = prepare_html_and_assets(res.text, page_url, files_dir_name)
+    logging.info(PREPARE_DATA.format())
 
-    with open(html_file_path, 'w') as f:
-        f.write(html)
-    
-    logging.info("html_file created successfully: %s in %s" % (html_file_name, input_path))
-        
-    if os.path.isdir(files_dir_path):
-        shutil.rmtree(files_dir_path)
+    html, files = prepare_html_and_files(res.text, page_url, files_dir_name)
 
-    os.mkdir(files_dir_path)
+    if len(files):
+        make_files_dir(files_dir_path)
+        logging.info(FILES_DIR_CREATED.format(files_dir_name))
 
-    logging.info("files_dir created successfully: %s" % files_dir_name)
+        logging.info(START_DOWNLOAD_FILES.format(len(files)))
+        errors = download_files(files, files_dir_path)
 
-    download_assets(assets, files_dir_path)
+        if len(errors):
+            for err in errors:
+                logging.warning(err)
+
+        logging.info(FINISH_DOWNLOAD_FILES.format(len(files) - len(errors)))
+
+    save_html(html, html_file_path)
+    logging.info(HTML_FILE_CREATED.format(html_file_name))
 
     return html_file_name

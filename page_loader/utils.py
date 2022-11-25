@@ -1,5 +1,8 @@
 import re
-from os.path import splitext
+import os
+import shutil
+from os.path import splitext, isdir
+
 
 def format_name(name):
     words = re.split('[^а-яa-z0-9]', name)
@@ -17,3 +20,13 @@ def make_file_name(url):
     if fileExtension:
         return f'{name}{fileExtension}'
     return f'{name}.html'
+
+def make_files_dir(files_dir_path):
+    if isdir(files_dir_path):
+        shutil.rmtree(files_dir_path)
+
+    os.mkdir(files_dir_path)
+
+def save_html(html, html_file_path):
+    with open(html_file_path, 'w') as f:
+        f.write(html)
