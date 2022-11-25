@@ -71,4 +71,4 @@ def download(input_url, input_path):
     logging.info(HTML_FILE_CREATED.format(html_file_name))
     logging.info(FINISH_DOWNLOAD.format(html_file_path))
 
-    return html_file_name
+    return html_file_path

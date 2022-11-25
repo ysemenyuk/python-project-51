@@ -24,11 +24,11 @@ test_url = 'http://test.com'
 def test_page_loader(tmpdir, requests_mock):
     data = read(src_file)
     requests_mock.get(test_url, text=data)
-    res_file = download(test_url, tmpdir)
-    
-    actual = read(res_file)
+    output_file_path = download(test_url, tmpdir)
+
+    actual = read(output_file_path)
     expected = read(exp_file)
-    
+
     assert actual == expected
 
 
