@@ -16,6 +16,7 @@ def read(file_path):
         result = f.read()
     return result
 
+
 src_file = os.path.join('tests/fixtures', 'page.html')
 exp_file = os.path.join('tests/fixtures', 'expected.html')
 test_url = 'http://test.com'
