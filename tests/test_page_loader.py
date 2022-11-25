@@ -42,7 +42,7 @@ data = [
     (HTML_FILE_URL, HTML_FILE_NAME),
     (IMG_FILE_URL, IMG_FILE_NAME),
     (JS_FILE_URL, JS_FILE_NAME)
-    ]
+]
 
 
 @pytest.mark.parametrize('link, file_name', data)
@@ -54,8 +54,7 @@ def test_page_loader(tmpdir, requests_mock):
     requests_mock.get(PAGE_URL, text=read_file(page_path))
     requests_mock.get(CSS_FILE_URL, text=read_file(css_file_path))
     requests_mock.get(HTML_FILE_URL, text=read_file(html_file_path))
-    requests_mock.get(IMG_FILE_URL, content=read_file(img_file_path,
-                                                      type='rb'))
+    requests_mock.get(IMG_FILE_URL, content=read_file(img_file_path, type='rb'))  # noqa: E501
     requests_mock.get(JS_FILE_URL, text=read_file(js_file_path))
 
     # html
