@@ -32,3 +32,9 @@ def make_files_dir(files_dir_path):
 def save_html(html, html_file_path):
     with open(html_file_path, 'w') as f:
         f.write(html)
+
+
+def read_file(file_path, type='r'):
+    with open(file_path, type) as f:
+        result = f.read()
+    return result
