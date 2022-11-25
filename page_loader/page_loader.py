@@ -22,6 +22,7 @@ FILES_DIR_CREATED = 'files_dir created successfully: "{}"'
 START_DOWNLOAD_FILES = 'Start download local files. Total count: "{}"'
 FINISH_DOWNLOAD_FILES = 'Files download successfully: "{}"'
 ERRORS_DOWNLOAD = '"{}" files did not download'
+FINISH_DOWNLOAD = 'Finish download "{}"'
 
 
 def download(input_url, input_path):
@@ -68,5 +69,6 @@ def download(input_url, input_path):
 
     save_html(html, html_file_path)
     logging.info(HTML_FILE_CREATED.format(html_file_name))
+    logging.info(FINISH_DOWNLOAD.format(html_file_path))
 
     return html_file_name

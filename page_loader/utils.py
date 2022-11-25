@@ -21,11 +21,13 @@ def make_file_name(url):
         return f'{name}{fileExtension}'
     return f'{name}.html'
 
+
 def make_files_dir(files_dir_path):
     if isdir(files_dir_path):
         shutil.rmtree(files_dir_path)
 
     os.mkdir(files_dir_path)
+
 
 def save_html(html, html_file_path):
     with open(html_file_path, 'w') as f:
