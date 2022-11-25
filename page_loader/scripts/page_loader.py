@@ -22,7 +22,7 @@ def main():
     except ValueError as e:
         print(e)
         sys.exit(1)
-    
+
     sys.exit(0)
 
 
